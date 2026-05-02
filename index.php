@@ -43,12 +43,14 @@
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
 
-    <div class="d-flex align-items-center justify-content-between">
-      <a href="index.html" class="logo d-flex align-items-center">
-        <img src="assets/img/logo.png" alt="">
-        <span class="d-none d-lg-block">inventori</span>
-      </a>
-      <i class="bi bi-list toggle-sidebar-btn"></i>
+     <nav class="header-nav ms-auto">
+       <ul class="d-flex align-items-center">
+         <li class="nav-item pe-3">
+         <img src="assets/img/profile-img.jpg" class="rounded-circle" width="40">
+      </li>
+      </ul>
+       </nav>
+       </header>
     </div><!-- End Logo -->
 
     
@@ -255,46 +257,54 @@
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
 
-    <ul class="sidebar-nav" id="sidebar-nav">
+  <ul class="sidebar-nav" id="sidebar-nav">
 
-      <li class="nav-item">
-        <a class="nav-link " href="index.html">
-          <i class="bi bi-grid"></i>
-          <span>Dashboard</span>
-        </a>
-      </li><!-- End Dashboard Nav -->
+    <li class="nav-item">
+      <a class="nav-link" href="index.php">
+        <i class="bi bi-grid"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
 
-    
+    <li class="nav-item">
+      <a class="nav-link" href="kategori_produk.php">
+        <i class="bi bi-tags"></i>
+        <span>Kategori Produk</span>
+      </a>
+    </li>
 
-     
+    <li class="nav-item">
+      <a class="nav-link" href="produk.php">
+        <i class="bi bi-box"></i>
+        <span>Data Produk</span>
+      </a>
+    </li>
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="users-Kategori produk.html">
-          <i class="bi bi-tags"></i>
-          <span>Kategori Produk</span>
-        </a>
-      </li><!-- End Profile Page Nav -->
+    <li class="nav-item">
+      <a class="nav-link" href="stok.php">
+        <i class="bi bi-archive"></i>
+        <span>Stok</span>
+      </a>
+    </li>
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-Data Produk.html">
-          <i class="bi bi-box"></i>
-          <span>Data Produk</span>
-        </a>
-      </li><!-- End F.A.Q Page Nav -->
+    <li class="nav-item">
+      <a class="nav-link" href="laporan.php">
+        <i class="bi bi-bar-chart"></i>
+        <span>Laporan</span>
+      </a>
+    </li>
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-Laporan.html">
-          <i class="bi bi-bar-chart-line"></i>
-          <span>Laporan</span>
-        </a>
-      </li><!-- End Contact Page Nav -->
+    <li class="nav-item">
+      <a class="nav-link" href="users.php">
+        <i class="bi bi-people"></i>
+        <span>Manajemen User</span>
+      </a>
+    </li>
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-Manajemen User.html">
-          <i class="bi bi-people"></i>
-          <span>Manajemen User</span>
-        </a>
-      </li><!-- End Register Page Nav -->
+  </ul>
+
+</aside>
+
 
   </aside><!-- End Sidebar-->
 
