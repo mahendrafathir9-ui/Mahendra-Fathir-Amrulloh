@@ -120,35 +120,28 @@
     </li>
 
     <li class="nav-item">
-      <a class="nav-link" href="kategori_produk.php">
+      <a class="nav-link collapsed" href="kategori_produk.php">
         <i class="bi bi-tags"></i>
         <span>Kategori Produk</span>
       </a>
     </li>
 
-    <li class="nav-item">
-      <a class="nav-link" href="produk.php">
+    <li class="nav-item ">
+      <a class="nav-link collapsed" href="produk.php">
         <i class="bi bi-box"></i>
         <span>Data Produk</span>
       </a>
     </li>
 
     <li class="nav-item">
-      <a class="nav-link" href="stok.php">
-        <i class="bi bi-archive"></i>
-        <span>Stok</span>
-      </a>
-    </li>
-
-    <li class="nav-item">
-      <a class="nav-link" href="laporan.php">
+      <a class="nav-link collapsed" href="laporan.php">
         <i class="bi bi-bar-chart"></i>
         <span>Laporan</span>
       </a>
     </li>
 
     <li class="nav-item">
-      <a class="nav-link" href="users.php">
+      <a class="nav-link collapsed" href="users.php">
         <i class="bi bi-people"></i>
         <span>Manajemen User</span>
       </a>
