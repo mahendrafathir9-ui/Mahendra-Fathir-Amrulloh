@@ -48,7 +48,7 @@ if (!isset($_SESSION['login'])) {
     <div class="d-flex align-items-center justify-content-between">
       <a href="index.php" class="logo d-flex align-items-center">
         <img src="assets/img/logo.png" alt="">
-        <span class="d-none d-lg-block">Inventori</span>
+        <span class="d-none d-lg-block">inventori</span>
       </a>
       <i class="bi bi-list toggle-sidebar-btn"></i>
     </div><!-- End Logo -->
@@ -212,7 +212,7 @@ if (!isset($_SESSION['login'])) {
    <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
     <div class="copyright">
-      &copy; Copyright <strong><span>Inventori</span></strong>. All Rights Reserved
+      &copy; Copyright <strong><span>inventori</span></strong>. All Rights Reserved
     </div>
     <div class="credits">
       Designed by <a href="https://www.instagram.com/nehamstar?igsh=MTZuZnV2YWxlcm5ucw==">Mahendra Fathir Amrulloh</a>

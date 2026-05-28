@@ -1,40 +1,36 @@
 <?php
-// Require composer autoload
-require_once __DIR__ . '/vendor/autoload.php';
-
+//  Require composer autoload
+require 'vendor/autoload.php';  
 // Koneksi database
-require_once('koneksi.php');
+require_once ('koneksi.php');
 
-function query($query)
-{
-    global $conn;
-    $result = mysqli_query($conn, $query);
+function query($query) {
+  global $conn;
+  $result = mysqli_query($conn, $query);
 
-    $rows = [];
-    while ($row = mysqli_fetch_assoc($result)) {
-        $rows[] = $row;
-    }
-
-    return $rows;
+  $rows = [];
+  while ($row = mysqli_fetch_assoc($result)) {
+    $rows[] = $row;
+  }
+  return $rows;
 }
 
 // Ambil data produk dengan stok minimum
-$data = query("
-    SELECT
-        p.id,
-        p.product_code,
-        p.product_name,
-        c.category_name,
-        p.stock,
-        p.min_stock,
-        p.price,
-        p.gambar,
+$data = query(" 
+    SELECT 
+        p.id, 
+        p.product_code, 
+        p.product_name, 
+        c.category_name, 
+        p.stock, 
+        p.min_stock, 
+        p.price, 
+        p.gambar, 
         p.created_at
     FROM products p
     JOIN categories c ON p.category_id = c.id
     WHERE p.stock <= p.min_stock
-    ORDER BY p.stock ASC
-");
+    ORDER BY p.stock ASC");
 
 // Inisialisasi mPDF
 $mpdf = new \Mpdf\Mpdf([
@@ -47,47 +43,46 @@ $html = '
     <title>Laporan Stok Minimum</title>
 
     <style>
-        body {
-            font-family: sans-serif;
+        body { font-family: sans-serif;
         }
 
-        h1 {
-            text-align: center;
-            color: #262626;
-            margin-bottom: 5px;
+        h1 { 
+            text-align: center; 
+             color: #262626;
+             margin-bottom: 5px;
         }
 
-        h3 {
-            text-align: center;
-            margin-top: 0;
-            margin-bottom: 20px;
-            color: #dc3545;
+        h3 { 
+            text-align: center; 
+             margin-top: 0;
+             margin-bottom: 20px;
+             color: #dc3545;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
+        table { 
+                width: 100%; 
+                border-collapse: collapse; 
+                margin-top: 10px;
         }
 
-        thead th {
-            background-color: #dc3545;
-            color: white;
-            padding: 10px;
-            font-size: 12px;
+        thead th { 
+                background-color: #dc3545; 
+                color: white;
+                padding: 10px; 
+                font-size: 12px;
         }
 
         tbody td {
-            padding: 8px;
-            font-size: 11px;
-            border: 1px solid #ccc;
+                padding: 8px;
+                font-size: 11px;
+                border: 1px solid #ccc;
         }
 
         tbody tr:nth-child(even) {
-            background-color: #f8f9fa;
+                background-color: #f8f9fa;
         }
 
-        .text-center {
+        text-center { 
             text-align: center;
         }
 
@@ -96,7 +91,7 @@ $html = '
         }
 
         img {
-            width: 70px;
+            max-width: 70px;
             height: 70px;
             object-fit: cover;
         }
@@ -107,14 +102,13 @@ $html = '
         }
 
         .warning {
-            background-color: #ffe5e5;
+        background-color: #ffe5e5;
         }
     </style>
 </head>
 
 <body>
-
-    <h1>Nama Sistem</h1>
+    <h1>inventori</h1>
     <hr>
     <h3>LAPORAN STOK MINIMUM</h3>
 
@@ -133,7 +127,7 @@ $html = '
                 <th>Tanggal Dibuat</th>
             </tr>
         </thead>
-        
+
         <tbody>
 ';
 
@@ -146,27 +140,26 @@ foreach ($data as $row) {
     // Path gambar
     $gambar = 'produk_img/' . $row['gambar'];
 
-    // Jika gambar kosong
-    if (empty($row['gambar']) || !file_exists($gambar)) {
+    // jika gambar kosong
+    if (empty($row['gambar'])) {
         $gambarHtml = '-';
     } else {
         $gambarHtml = '<img src="' . $gambar . '">';
     }
 
     $html .= '
-        <tr class="warning">
+        <tr>
             <td class="text-center">' . $no++ . '</td>
             <td class="text-center">' . $gambarHtml . '</td>
-            <td>' . $row['product_code'] . '</td>
+            <td class="text-center">' . $row['product_code'] . '</td>
             <td>' . $row['product_name'] . '</td>
-            <td>' . $row['category_name'] . '</td>
+            <td class="text-center">' . $row['category_name'] . '</td>
             <td class="text-right">' . $harga . '</td>
-            <td class="text-center stok-minimum">' . $row['stock'] . '</td>
+            <td class="text-center">' . $row['stock'] . '</td>
             <td class="text-center">' . $row['min_stock'] . '</td>
-            <td class="text-center stok-minimum">Stok Minimum</td>
+            <td class="text-center"><span class="stok-minimum">Stok Minimum</span></td>
             <td class="text-center">' . date('d-m-Y H:i', strtotime($row['created_at'])) . '</td>
-        </tr>
-    ';
+        </tr>';
 }
 
 $html .= '
@@ -174,10 +167,9 @@ $html .= '
     </table>
 
 </body>
-</html>
-';
+</html>';
 
-// Generate PDF
+// generate PDF
 $mpdf->WriteHTML($html);
 $mpdf->Output('laporan_stok_minimum.pdf', 'I');
 ?>

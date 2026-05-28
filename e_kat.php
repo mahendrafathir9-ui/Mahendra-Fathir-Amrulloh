@@ -1,5 +1,13 @@
 <?php
-include "koneksi.php";
+session_start();
+include 'koneksi.php';
+
+// cek apakah sudah login
+if (!isset($_SESSION['login'])) {
+    header('Location: login.php');
+    exit;
+}
+
 $id = $_GET['id'];
 $sql = mysqli_query($conn, "SELECT * FROM categories WHERE id = '$id'");
 $hasil = mysqli_fetch_array($sql);
@@ -24,7 +32,7 @@ if (isset($_POST['update'])) {
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Data Produk - inventori</title>
+  <title>Kategoori Produk - inventori</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -47,12 +55,11 @@ if (isset($_POST['update'])) {
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
-
 </head>
 
 <body>
 
- <!-- ======= Header ======= -->
+  <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
 
     <div class="d-flex align-items-center justify-content-between">
@@ -63,9 +70,9 @@ if (isset($_POST['update'])) {
       <i class="bi bi-list toggle-sidebar-btn"></i>
     </div><!-- End Logo -->
 
+
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
-
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
@@ -74,108 +81,67 @@ if (isset($_POST['update'])) {
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
-              <h6>Kevin Anderson</h6>
-              <span>Web Designer</span>
+              <h6><?php echo isset($_SESSION['name']) ? $_SESSION['name'] : 'User'; ?></h6>
+              <span><?php echo isset($_SESSION['role']) ? $_SESSION['role'] : 'Role'; ?></span>
             </li>
             <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-person"></i>
-                <span>My Profile</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
+              <hr class="dropdown-divider" />
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-gear"></i>
-                <span>Account Settings</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
-                <i class="bi bi-question-circle"></i>
-                <span>Need Help?</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="#">
+              <a class="dropdown-item d-flex align-items-center" href="logout.php">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Sign Out</span>
               </a>
             </li>
-
           </ul><!-- End Profile Dropdown Items -->
         </li><!-- End Profile Nav -->
-
       </ul>
     </nav><!-- End Icons Navigation -->
 
   </header><!-- End Header -->
 
-   <!-- ======= Sidebar ======= -->
- <aside id="sidebar" class="sidebar">
+  <!-- ======= Sidebar ======= -->
+   <aside id="sidebar" class="sidebar">
 
-  <ul class="sidebar-nav" id="sidebar-nav">
+    <ul class="sidebar-nav" id="sidebar-nav">
 
-    <li class="nav-item">
-      <a class="nav-link" href="index.php">
-        <i class="bi bi-grid"></i>
-        <span>Dashboard</span>
-      </a>
-    </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="index.php">
+          <i class="bi bi-grid"></i>
+          <span>Dashboard</span>
+        </a>
+      </li><!-- End Dashboard Nav -->
+      <li class="nav-item">
+        <a class="nav-link " href="kategori_produk.php">
+          <i class="bi bi-tags"></i>
+          <span>Kategori Produk</span>
+        </a>
+      </li><!-- End Profile Page Nav -->
 
-    <li class="nav-item">
-      <a class="nav-link" href="kategori_produk.php">
-        <i class="bi bi-tags"></i>
-        <span>Kategori Produk</span>
-      </a>
-    </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="produk.php">
+          <i class="bi bi-box-seam"></i>
+          <span>Data Produk</span>
+        </a>
+      </li><!-- End Data Produk Page Nav -->
 
-    <li class="nav-item">
-      <a class="nav-link" href="produk.php">
-        <i class="bi bi-box"></i>
-        <span>Data Produk</span>
-      </a>
-    </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="laporan.php">
+          <i class="bi bi-bar-chart-line"></i>
+          <span>Laporan</span>
+        </a>
+      </li><!-- End Laporan Page Nav -->
 
-    <li class="nav-item">
-      <a class="nav-link" href="stok.php">
-        <i class="bi bi-archive"></i>
-        <span>Stok</span>
-      </a>
-    </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="users.php">
+          <i class="bi bi-people"></i>
+          <span>Manajemen User</span>
+        </a>
+      </li><!-- End Register Page Nav -->
+    </ul>
 
-    <li class="nav-item">
-      <a class="nav-link" href="laporan.php">
-        <i class="bi bi-bar-chart"></i>
-        <span>Laporan</span>
-      </a>
-    </li>
-
-    <li class="nav-item">
-      <a class="nav-link" href="users.php">
-        <i class="bi bi-people"></i>
-        <span>Manajemen User</span>
-      </a>
-    </li>
-
-  </ul>
-
-</aside><!-- End Sidebar-->
+  </aside><!-- End Sidebar-->
 
   <main id="main" class="main">
 
@@ -184,51 +150,35 @@ if (isset($_POST['update'])) {
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
-          <li class="breadcrumb-item">Kategori Produk</li>
+          <li class="breadcrumb-item"><a href="kategori_produk.php">Kategori Produk</a></li>
           <li class="breadcrumb-item active">Edit</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
     <section class="section">
-      <div class="row">
-
         <div class="col-lg-6">
-
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Edit Kategori Produk</h5>
-
+              <!-- Vertical Form -->
               <form class="row g-3" method="post">
                 <div class="col-12">
                   <label for="kd_kat" class="form-label">Kode Kategori</label>
-                  <input type="text" class="form-control" id="kd_kat" name="kd_kat" value="<?php echo $hasil['kd_kat']; ?>" readonly>
+                  <input type="text" class="form-control" id="kd_kat" name="kd_kat" value="<?php echo $hasil["kd_kat"]; ?>" readonly>
                 </div>
                 <div class="col-12">
                   <label for="nm_kat" class="form-label">Nama Kategori</label>
-                <input type="text" class="form-control" id="nm_kat" name="nm_kat" value="<?php echo $hasil['category_name']; ?>" required
+                  <input type="text" class="form-control" id="nm_kat" name="nm_kat" value="<?php echo $hasil["category_name"]; ?>" required>
                 </div>
                 <div class="text-center">
-                  <button type="button" class="btn btn-warning"><a href="kategori_produk.php" style="color: black; text-decoration: none;">Kembali</a></button>
+                    <button type="button" class="btn btn-warning"><a href="kategori_produk.php" style="color: black; text-decoration:none;">Kembali</a></button>
                   <button type="reset" class="btn btn-secondary">Reset</button>
                   <button type="submit" class="btn btn-success" name="update">Update</button>
                 </div>
               </form><!-- Vertical Form -->
-
             </div>
           </div>
-
-          
-
-            </div>
-          </div>
-
-          
-
-            </div>
-          </div>
-
         </div>
-      </div>
     </section>
 
   </main><!-- End #main -->
@@ -236,14 +186,10 @@ if (isset($_POST['update'])) {
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
     <div class="copyright">
-      &copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights Reserved
+      &copy; Copyright <strong><span>inventori</span></strong>. All Rights Reserved
     </div>
     <div class="credits">
-      <!-- All the links in the footer should remain intact. -->
-      <!-- You can delete the links only if you purchased the pro version. -->
-      <!-- Licensing information: https://bootstrapmade.com/license/ -->
-      <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
-      Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+      Designed by <a href="https://www.instagram.com/nehamstar?igsh=MTZuZnV2YWxlcm5ucw==">Mahendra Fathir Amrulloh</a>
     </div>
   </footer><!-- End Footer -->
 

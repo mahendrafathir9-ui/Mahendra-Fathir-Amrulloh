@@ -1,44 +1,48 @@
 <?php
-include "koneksi.php";
+
+session_start();
+include 'koneksi.php';
+
+// cek apakah sudah login
+if (!isset($_SESSION['login'])) {
+    header('Location: login.php');
+    exit;
+}
 
 if (isset($_POST['submit'])) {
 
-    $product_id = $_POST['product_id'];
-    $change_type = $_POST['change_type'];
-    $qty = intval($_POST['qty']);
-    $note = $_POST['note'];
-    $user_id = $_SESSION['user_id'];
+  $product_id = $_POST['product_id'];
+  $change_type = $_POST['change_type'];
+  $qty = intval($_POST['qty']);
+  $note = $_POST['note'];
+  $user_id = $_SESSION['user_id'];
 
-    // ambil stok sekarang
-    $q = mysqli_query($conn, "SELECT stock FROM products WHERE id='$product_id'");
-    $data = mysqli_fetch_assoc($q);
+  // Ambil stok sekarang
+  $q = mysqli_query($conn, "SELECT stock FROM products WHERE id = '$product_id'");
+  $data = mysqli_fetch_assoc($q);
 
-    $stock_before = $data['stock'];
+  $stock_before = $data['stock'];
 
-    // hitung stok baru
-    if ($change_type == "ADD") {
-        $stock_after = $stock_before + $qty;
-    } else {
-        $stock_after = $stock_before - $qty;
-
-        if ($stock_after < 0) {
-            echo "<script>alert('Stok tidak cukup!');</script>";
-            exit;
-        }
+  // Hitung stok baru
+  if ($change_type == 'ADD') {
+    $stock_after = $stock_before + $qty;
+  } else {
+    $stock_after = $stock_before - $qty;
+    if ($stock_after < 0) {
+      echo "<script>alert('Stok tidak cukup');</script>";
+      exit;
     }
+  }
 
-    // update stok
-    mysqli_query($conn, "UPDATE products SET stock='$stock_after' WHERE id='$product_id'");
+  // Update stok
+  mysqli_query($conn, "UPDATE products SET stock = '$stock_after' WHERE id = '$product_id'");
 
-    // insert log
-    mysqli_query($conn, "INSERT INTO stock_logs 
-        (product_id, change_type, qty, stock_before, stock_after, note, created_by) 
-        VALUES 
-        ('$product_id','$change_type','$qty','$stock_before','$stock_after','$note','$user_id')
-    ");
+  // insert log
+  mysqli_query($conn, "INSERT INTO stock_logs (product_id, change_type, qty, stock_before, stock_after, note, created_by) 
+                      VALUES ('$product_id', '$change_type', '$qty', '$stock_before', '$stock_after', '$note', '$user_id')");
 
-    header("Location: stok.php?success=1");
-    exit;
+                      header("Location: stok.php?success=1");
+                      exit;
 }
 
 ?>
@@ -49,7 +53,7 @@ if (isset($_POST['submit'])) {
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Manajemen Stok - inventori</title>
+  <title>Stock - inventori</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -73,16 +77,15 @@ if (isset($_POST['submit'])) {
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
 
-  
+
 </head>
 
 <body>
-  <?php if (isset($_GET['success'])): ?>
-      <script>
-          alert('Stok berhasil diperbarui!');
-      </script>
-  <?php endif; ?>
-
+<?php if (isset($_GET['success'])): ?>
+  <script>
+    alert('Stok berhasil diperbarui!');
+  </script>
+<?php endif; ?>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
 
@@ -96,7 +99,7 @@ if (isset($_POST['submit'])) {
 
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
-
+        
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
@@ -105,45 +108,15 @@ if (isset($_POST['submit'])) {
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
-              <h6>Kevin Anderson</h6>
-              <span>Web Designer</span>
+              <h6><?php echo isset($_SESSION['name']) ? $_SESSION['name'] : 'User'; ?></h6>
+              <span><?php echo isset($_SESSION['role']) ? $_SESSION['role'] : 'Role'; ?></span>
             </li>
             <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-person"></i>
-                <span>My Profile</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
+              <hr class="dropdown-divider" />
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-gear"></i>
-                <span>Account Settings</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
-                <i class="bi bi-question-circle"></i>
-                <span>Need Help?</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="#">
+              <a class="dropdown-item d-flex align-items-center" href="logout.php">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Sign Out</span>
               </a>
@@ -157,7 +130,7 @@ if (isset($_POST['submit'])) {
 
   </header><!-- End Header -->
 
-    <!-- ======= Sidebar ======= -->
+  <!-- ======= Sidebar ======= -->
    <aside id="sidebar" class="sidebar">
 
     <ul class="sidebar-nav" id="sidebar-nav">
@@ -176,7 +149,7 @@ if (isset($_POST['submit'])) {
       </li><!-- End Profile Page Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="produk.php">
+        <a class="nav-link " href="produk.php">
           <i class="bi bi-box-seam"></i>
           <span>Data Produk</span>
         </a>
@@ -190,7 +163,7 @@ if (isset($_POST['submit'])) {
       </li><!-- End Laporan Page Nav -->
 
       <li class="nav-item">
-        <a class="nav-link " href="users.php">
+        <a class="nav-link collapsed" href="users.php">
           <i class="bi bi-people"></i>
           <span>Manajemen User</span>
         </a>
@@ -198,231 +171,7 @@ if (isset($_POST['submit'])) {
     </ul>
 
   </aside><!-- End Sidebar-->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-menu-button-wide"></i><span>Components</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="components-alerts.html">
-              <i class="bi bi-circle"></i><span>Alerts</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-accordion.html">
-              <i class="bi bi-circle"></i><span>Accordion</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-badges.html">
-              <i class="bi bi-circle"></i><span>Badges</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-breadcrumbs.html">
-              <i class="bi bi-circle"></i><span>Breadcrumbs</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-buttons.html">
-              <i class="bi bi-circle"></i><span>Buttons</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-cards.html">
-              <i class="bi bi-circle"></i><span>Cards</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-carousel.html">
-              <i class="bi bi-circle"></i><span>Carousel</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-list-group.html">
-              <i class="bi bi-circle"></i><span>List group</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-modal.html">
-              <i class="bi bi-circle"></i><span>Modal</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-tabs.html">
-              <i class="bi bi-circle"></i><span>Tabs</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-pagination.html">
-              <i class="bi bi-circle"></i><span>Pagination</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-progress.html">
-              <i class="bi bi-circle"></i><span>Progress</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-spinners.html">
-              <i class="bi bi-circle"></i><span>Spinners</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-tooltips.html">
-              <i class="bi bi-circle"></i><span>Tooltips</span>
-            </a>
-          </li>
-        </ul>
-      </li><!-- End Components Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-journal-text"></i><span>Forms</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="forms-elements.html">
-              <i class="bi bi-circle"></i><span>Form Elements</span>
-            </a>
-          </li>
-          <li>
-            <a href="forms-layouts.html">
-              <i class="bi bi-circle"></i><span>Form Layouts</span>
-            </a>
-          </li>
-          <li>
-            <a href="forms-editors.html">
-              <i class="bi bi-circle"></i><span>Form Editors</span>
-            </a>
-          </li>
-          <li>
-            <a href="forms-validation.html">
-              <i class="bi bi-circle"></i><span>Form Validation</span>
-            </a>
-          </li>
-        </ul>
-      </li><!-- End Forms Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-layout-text-window-reverse"></i><span>Tables</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="tables-general.html">
-              <i class="bi bi-circle"></i><span>General Tables</span>
-            </a>
-          </li>
-          <li>
-            <a href="tables-data.html">
-              <i class="bi bi-circle"></i><span>Data Tables</span>
-            </a>
-          </li>
-        </ul>
-      </li><!-- End Tables Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-bar-chart"></i><span>Charts</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="charts-chartjs.html">
-              <i class="bi bi-circle"></i><span>Chart.js</span>
-            </a>
-          </li>
-          <li>
-            <a href="charts-apexcharts.html">
-              <i class="bi bi-circle"></i><span>ApexCharts</span>
-            </a>
-          </li>
-          <li>
-            <a href="charts-echarts.html">
-              <i class="bi bi-circle"></i><span>ECharts</span>
-            </a>
-          </li>
-        </ul>
-      </li><!-- End Charts Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-gem"></i><span>Icons</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="icons-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="icons-bootstrap.html">
-              <i class="bi bi-circle"></i><span>Bootstrap Icons</span>
-            </a>
-          </li>
-          <li>
-            <a href="icons-remix.html">
-              <i class="bi bi-circle"></i><span>Remix Icons</span>
-            </a>
-          </li>
-          <li>
-            <a href="icons-boxicons.html">
-              <i class="bi bi-circle"></i><span>Boxicons</span>
-            </a>
-          </li>
-        </ul>
-      </li><!-- End Icons Nav -->
-
-      <li class="nav-heading">Pages</li>
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="users-profile.html">
-          <i class="bi bi-person"></i>
-          <span>Profile</span>
-        </a>
-      </li><!-- End Profile Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-faq.html">
-          <i class="bi bi-question-circle"></i>
-          <span>F.A.Q</span>
-        </a>
-      </li><!-- End F.A.Q Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-contact.html">
-          <i class="bi bi-envelope"></i>
-          <span>Contact</span>
-        </a>
-      </li><!-- End Contact Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-register.html">
-          <i class="bi bi-card-list"></i>
-          <span>Register</span>
-        </a>
-      </li><!-- End Register Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-login.html">
-          <i class="bi bi-box-arrow-in-right"></i>
-          <span>Login</span>
-        </a>
-      </li><!-- End Login Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-error-404.html">
-          <i class="bi bi-dash-circle"></i>
-          <span>Error 404</span>
-        </a>
-      </li><!-- End Error 404 Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link " href="pages-blank.html">
-          <i class="bi bi-file-earmark"></i>
-          <span>Blank</span>
-        </a>
-      </li><!-- End Blank Page Nav -->
-
-    </ul>
-
-  </aside><!-- End Sidebar-->
+  
 
   <main id="main" class="main">
 
@@ -431,124 +180,106 @@ if (isset($_POST['submit'])) {
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
-          <li class="breadcrumb-item">Data Produk</li>
+          <li class="breadcrumb-item"><a href="produk.php">Data Produk</a></li>
           <li class="breadcrumb-item active">Manajemen Stok</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
 
     <section class="section">
-        <div class="row">
-
-            <div class="col-lg-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Manajemen Stok</h5>
-
-                        <form method="POST">
-                            <div class="mb-3">
-                                <label class="form-label">Pilih Produk</label>
-                                <select name="product_id" class="form-select" required>
-                                    <option selected disabled>-- Pilih Produk --</option>
-                                    <?php
-                                    include "koneksi.php";
-                                    $produk = mysqli_query($conn, "SELECT * FROM products");
-                                    while ($p = mysqli_fetch_assoc($produk)) {
-                                        echo "<option value='{$p['id']}'>{$p['product_name']}</option>";
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Jenis Aksi</label>
-                                <select name="change_type" class="form-select">
-                                    <option value="ADD">Tambah Stok</option>
-                                    <option value="REDUCE">Kurangi Stok</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Jumlah</label>
-                                <input type="number" name="qty" class="form-control" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Catatan</label>
-                                <textarea name="note" class="form-control" rows="2"></textarea>
-                            </div>
-
-                            <button type="submit" name="submit" class="btn btn-primary w-100">
-                                Simpan Perubahan
-                            </button>
-                        </form>
-
-                    </div>
-                </div>
+      <div class="row">
+        <!-- FORM MANAJEMEN STOK -->
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Manajemen Stok</h5>
+              <form method="post">
+              <div class="mb-3">
+                <label class="form-label">Pilih Produk</label>
+                <select name="product_id" class="form-select" required>
+                  <option value="">-- Pilih Produk --</option>
+                  <?php
+                  include 'koneksi.php';
+                  $produk = mysqli_query($conn, "SELECT * FROM products");
+                  while ($p = mysqli_fetch_assoc($produk)) {
+                    echo "<option value='{$p['id']}'>{$p['product_name']}</option>";
+                  }
+                  ?>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Jenis Aksi</label>
+                <select name="change_type" class="form-select">
+                  <option value="ADD">Tambah Stok</option>
+                  <option value="REDUCE">Kurangi Stok</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Jumlah</label>
+                <input type="number" name="qty" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Catatan</label>
+                <textarea name="note" class="form-control" rows="2"></textarea>
+              </div>
+              <button type="submit" name="submit" class="btn btn-primary">Simpan Perubahan</button>
+              </form>
             </div>
+          </div>
+        </div>
 
-            <div class="col-lg-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Riwayat Stok</h5>
+        <!-- RIWAYAT STOK -->
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Riwayat Stok</h5>
 
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Tanggal</th>
-                                    <th>Produk</th>
-                                    <th>Aksi</th>
-                                    <th>Qty</th>
-                                    <th>User</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                $query = mysqli_query($conn, "
-SELECT sl.*, p.product_name, u.name
-FROM stock_logs sl
-JOIN products p ON sl.product_id = p.id
-JOIN users u ON sl.created_by = u.id
-ORDER BY sl.created_at DESC
-");
-
-                                while ($row = mysqli_fetch_assoc($query)) {
-                                    $badge = $row['change_type'] == 'ADD'
-                                        ? "<span class='badge bg-success'>+ (ADD)</span>"
-                                        : "<span class='badge bg-danger'>- (REDUCE)</span>";
-                                
-                                    echo "<tr>
-            <td>" . date('d M Y', strtotime($row['created_at'])) . "</td>
-            <td>{$row['product_name']}</td>
-            <td>$badge</td>
-            <td>{$row['qty']}</td>
-            <td>{$row['name']}</td>
-        </tr>";
-                                        }
-                                        ?>
-                                    </tbody>
-                                </table>
-
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </section>
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col">Tanggal</th>
+                    <th scope="col">Produk</th>
+                    <th scope="col">Aksi</th>
+                    <th scope="col">Qty</th>
+                    <th scope="col">User</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php
+                  $query = mysqli_query($conn, "SELECT sl.*, p.product_name, u.name FROM stock_logs sl 
+                            JOIN products p ON sl.product_id = p.id 
+                            JOIN users u ON sl.created_by = u.id 
+                            ORDER BY sl.created_at DESC");
+                  while ($row = mysqli_fetch_assoc($query)) {
+                    $badge = $row['change_type'] == 'ADD'
+                    ? "<span class='badge bg-success'>+ (ADD)</span>"
+                    : "<span class='badge bg-danger'>- (REDUCE)</span>";
+                    echo "<tr>
+                            <td>" . date('d M Y H:i', strtotime($row['created_at'])) . "</td>
+                            <td>{$row['product_name']}</td>
+                            <td>{$badge}</td>
+                            <td>{$row['qty']}</td>
+                            <td>{$row['name']}</td>
+                          </tr>";
+                  }
+                  ?>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
   </main><!-- End #main -->
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
     <div class="copyright">
-      &copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights Reserved
+      &copy; Copyright <strong><span>inventori</span></strong>. All Rights Reserved
     </div>
     <div class="credits">
-      <!-- All the links in the footer should remain intact. -->
-      <!-- You can delete the links only if you purchased the pro version. -->
-      <!-- Licensing information: https://bootstrapmade.com/license/ -->
-      <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
-      Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+      Designed by <a href="https://www.instagram.com/nehamstar?igsh=MTZuZnV2YWxlcm5ucw==">Mahendra Fathir Amrulloh</a>
     </div>
   </footer><!-- End Footer -->
 

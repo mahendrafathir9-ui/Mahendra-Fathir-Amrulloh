@@ -1,3 +1,13 @@
+<?php
+session_start();
+include 'koneksi.php';
+
+// cek apakah sudah login
+if (!isset($_SESSION['login'])) {
+    header('Location: login.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,7 +15,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Data Produk - inventori</title>
+  <title>Kategori Produk - inventori</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -29,7 +39,6 @@
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
 
-  
 </head>
 
 <body>
@@ -56,45 +65,15 @@
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
-              <h6>Kevin Anderson</h6>
-              <span>Web Designer</span>
+              <h6><?php echo isset($_SESSION['name']) ? $_SESSION['name'] : 'User'; ?></h6>
+              <span><?php echo isset($_SESSION['role']) ? $_SESSION['role'] : 'Role'; ?></span>
             </li>
             <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-person"></i>
-                <span>My Profile</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
+              <hr class="dropdown-divider" />
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-gear"></i>
-                <span>Account Settings</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
-                <i class="bi bi-question-circle"></i>
-                <span>Need Help?</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="#">
+              <a class="dropdown-item d-flex align-items-center" href="logout.php">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Sign Out</span>
               </a>
@@ -114,63 +93,39 @@
     <ul class="sidebar-nav" id="sidebar-nav">
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="index.html">
+        <a class="nav-link collapsed" href="index.php">
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>
       </li><!-- End Dashboard Nav -->
+      <li class="nav-item">
+        <a class="nav-link " href="kategori_produk.php">
+          <i class="bi bi-tags"></i>
+          <span>Kategori Produk</span>
+        </a>
+      </li><!-- End Profile Page Nav -->
 
-      <aside id="sidebar" class="sidebar">
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="produk.php">
+          <i class="bi bi-box-seam"></i>
+          <span>Data Produk</span>
+        </a>
+      </li><!-- End Data Produk Page Nav -->
 
-  <ul class="sidebar-nav" id="sidebar-nav">
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="laporan.php">
+          <i class="bi bi-bar-chart-line"></i>
+          <span>Laporan</span>
+        </a>
+      </li><!-- End Laporan Page Nav -->
 
-    <li class="nav-item">
-      <a class="nav-link" href="index.php">
-        <i class="bi bi-grid"></i>
-        <span>Dashboard</span>
-      </a>
-    </li>
-
-    <li class="nav-item">
-      <a class="nav-link" href="kategori_produk.php">
-        <i class="bi bi-tags"></i>
-        <span>Kategori Produk</span>
-      </a>
-    </li>
-
-    <li class="nav-item">
-      <a class="nav-link" href="produk.php">
-        <i class="bi bi-box"></i>
-        <span>Data Produk</span>
-      </a>
-    </li>
-
-    <li class="nav-item">
-      <a class="nav-link" href="stok.php">
-        <i class="bi bi-archive"></i>
-        <span>Stok</span>
-      </a>
-    </li>
-
-    <li class="nav-item">
-      <a class="nav-link" href="laporan.php">
-        <i class="bi bi-bar-chart"></i>
-        <span>Laporan</span>
-      </a>
-    </li>
-
-    <li class="nav-item">
-      <a class="nav-link" href="users.php">
-        <i class="bi bi-people"></i>
-        <span>Manajemen User</span>
-      </a>
-    </li>
-
-  </ul>
-
-</aside>
-
-
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="users.php">
+          <i class="bi bi-people"></i>
+          <span>Manajemen User</span>
+        </a>
+      </li><!-- End Register Page Nav -->
+    </ul>
   </aside><!-- End Sidebar-->
 
   <main id="main" class="main">
@@ -184,8 +139,7 @@
         </ol>
       </nav>
     </div><!-- End Page Title -->
-
-    <section class="section">
+    
       <div class="row">
         <div class="col-lg-12">
 
@@ -196,7 +150,7 @@
           </div>
         </div>
       </div>
-
+    <section class="section">
       <div class="row">
         <div class="col-lg-12">
 
@@ -245,14 +199,10 @@
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
     <div class="copyright">
-      &copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights Reserved
+      &copy; Copyright <strong><span>inventori</span></strong>. All Rights Reserved
     </div>
     <div class="credits">
-      <!-- All the links in the footer should remain intact. -->
-      <!-- You can delete the links only if you purchased the pro version. -->
-      <!-- Licensing information: https://bootstrapmade.com/license/ -->
-      <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
-      Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+      Designed by <a href="https://www.instagram.com/nehamstar?igsh=MTZuZnV2YWxlcm5ucw==">Mahendra Fathir Amrulloh</a>
     </div>
   </footer><!-- End Footer -->
 

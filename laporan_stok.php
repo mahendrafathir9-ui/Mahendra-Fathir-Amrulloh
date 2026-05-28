@@ -1,34 +1,32 @@
 <?php
-// Require composer autoload
+//  Require composer autoload
 require_once __DIR__ . '/vendor/autoload.php';
 
 // Koneksi database
-require_once('koneksi.php');
+require_once ('koneksi.php');
 
-function query($query)
-{
-    global $conn;
-    $result = mysqli_query($conn, $query);
+function query($query) {
+  global $conn;
+  $result = mysqli_query($conn, $query);
 
-    $rows = [];
-    while ($row = mysqli_fetch_assoc($result)) {
-        $rows[] = $row;
-    }
-
-    return $rows;
+  $rows = [];
+  while ($row = mysqli_fetch_assoc($result)) {
+    $rows[] = $row;
+  }
+  return $rows;
 }
 
 // Ambil data produk + kategori
 $data = query("
     SELECT 
-        p.id,
-        p.product_code,
-        p.product_name,
-        c.category_name,
-        p.stock,
-        p.min_stock,
-        p.price,
-        p.gambar,
+        p.id, 
+        p.product_code, 
+        p.product_name, 
+        c.category_name, 
+        p.stock, 
+        p.min_stock, 
+        p.price, 
+        p.gambar, 
         p.created_at
     FROM products p
     JOIN categories c ON p.category_id = c.id
@@ -46,74 +44,63 @@ $html = '
     <title>Laporan Stok Barang</title>
 
     <style>
-        body {
-            font-family: sans-serif;
+        body { font-family: sans-serif; }
+
+        h1 { 
+            text-align: center; 
+             color: #262626;
+             margin-bottom: 5px;
         }
 
-        h1 {
-            text-align: center;
-            color: #262626;
-            margin-bottom: 5px;
+        h3 { 
+            text-align: center; 
+             margin-top: 0;
+             margin-bottom: 20px;
         }
-
-        h3 {
-            text-align: center;
-            margin-top: 0;
-            margin-bottom: 20px;
+        table { 
+                width: 100%; 
+                border-collapse: collapse; 
+                margin-bottom: 20px;
         }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
+        thead th { 
+                background-color: #4e73df; 
+                color: white;
+                padding: 10px; 
+                font-size: 12px;
         }
-
-        thead th {
-            background-color: #4e73df;
-            color: white;
-            padding: 10px;
-            font-size: 12px;
+        tbody td { 
+                padding: 8px;
+                font-size: 11px;
+                border: 1px solid #ccc;
         }
-
-        tbody td {
-            padding: 8px;
-            font-size: 11px;
-            border: 1px solid #ccc;
+        tbody tr:nth-child(even) { 
+            background-color: #f2f2f2; 
         }
-
-        tbody tr:nth-child(even) {
-            background-color: #f2f2f2;
+        text-center { 
+            text-align: center; 
         }
-
-        .text-center {
-            text-align: center;
+        text-right { 
+            text-align: right; 
         }
-
-        .text-right {
-            text-align: right;
-        }
-
-        img {
-            width: 70px;
-            height: 70px;
+        img { 
+            width: 70px; 
+            height: 70px; 
             object-fit: cover;
         }
-
-        .stok-aman {
-            color: green;
-            font-weight: bold;
+        .stok-aman { 
+            color: green; 
+            font-weight: bold; 
         }
-
-        .stok-minim {
-            color: red;
-            font-weight: bold;
+        .stok-minim { 
+            color: red; 
+            font-weight: bold; 
         }
     </style>
 </head>
 
 <body>
 
-<h1>Nama Sistem</h1>
+<h1>inventori</h1>
 <hr>
 <h3>LAPORAN STOK BARANG</h3>
 
@@ -132,34 +119,32 @@ $html = '
             <th>Tanggal Dibuat</th>
         </tr>
     </thead>
-    
+
     <tbody>
 ';
+    
+    $no = 1;
+    foreach ($data as $row) {
+        $harga = "Rp " . number_format($row['price'], 0, ',', '.');
 
-$no = 1;
+        // Status stok
+        if ($row['stock'] > $row['min_stock']) {
+            $status = '<span class="stok-minim">Stok Minim</span>';
+        } else {
+            $status = '<span class="stok-aman">Aman</span>';
+        }
 
-foreach ($data as $row) {
+        // path gambar
+        $gambar = 'produk_img/' . $row['gambar'];
 
-    $harga = "Rp " . number_format($row['price'], 0, ',', '.');
+        // Jika gambar kosong
+        if (empty($row['gambar']) || !file_exists($gambar)) {
+            $gambarHtml = '-';
+        } else {
+            $gambarHtml = '<img src="' . $gambar . '">';
+        }
 
-    // Status stok
-    if ($row['stock'] <= $row['min_stock']) {
-        $status = '<span class="stok-minim">Stok Minim</span>';
-    } else {
-        $status = '<span class="stok-aman">Aman</span>';
-    }
-
-    // Path gambar
-    $gambar = 'produk_img/' . $row['gambar'];
-
-    // Jika gambar kosong
-    if (empty($row['gambar']) || !file_exists($gambar)) {
-        $gambarHtml = '-';
-    } else {
-        $gambarHtml = '<img src="' . $gambar . '">';
-    }
-
-    $html .= '
+        $html .= '
         <tr>
             <td class="text-center">' . $no++ . '</td>
             <td class="text-center">' . $gambarHtml . '</td>
@@ -170,12 +155,12 @@ foreach ($data as $row) {
             <td class="text-center">' . $row['stock'] . '</td>
             <td class="text-center">' . $row['min_stock'] . '</td>
             <td class="text-center">' . $status . '</td>
-            <td class="text-center">' . date('d-m-Y H:i', strtotime($row['created_at'])) . '</td>
+            <td class="text-center">' . date('d-m-Y', strtotime($row['created_at'])) . '</td>
         </tr>
-    ';
-}
+        ';
+    }
 
-$html .= '
+    $html .= '
     </tbody>
 </table>
 
@@ -185,5 +170,5 @@ $html .= '
 
 // Tampilkan ke PDF
 $mpdf->WriteHTML($html);
-$mpdf->Output('laporan_stok_barang.pdf', 'I');
+$mpdf->Output('Laporan_Stok_Barang.pdf', 'I');
 ?>

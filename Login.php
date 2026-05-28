@@ -1,41 +1,40 @@
 <?php
 session_start();
-include "koneksi.php";
+include 'koneksi.php';
 
 if (isset($_POST['login'])) {
 
-  $email = mysqli_real_escape_string($conn, $_POST['email']);
-  $password = $_POST['password'];
+$email = mysqli_real_escape_string($conn, $_POST['email']);
+$password = $_POST['password'];
 
-  // cek user
-  $query = mysqli_query($conn, "SELECT * FROM users WHERE email='$email' LIMIT 1");
-  $user = mysqli_fetch_assoc($query);
+// cek user
+$query = mysqli_query($conn, "SELECT * FROM users WHERE email = '$email' LIMIT 1");
+$user = mysqli_fetch_assoc($query);
 
-  if ($user) {
+if ($user) {
 
-    // cek password (hash)
+  // cek password (hash)
     if (password_verify($password, $user['password'])) {
-
-      // cek aktif
-      if ($user['is_active'] == 1) {
+        // cek aktif
+        if ($user['is_active'] == 1) {
 
         // simpan session
-        $_SESSION['login'] = True;
+        $_SESSION['login'] = true;
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['name'] = $user['name'];
         $_SESSION['role'] = $user['role'];
 
         // redirect
-        header("Location: index.php");
+        header('Location: index.php');
         exit;
-      } else {
-        echo "<script>alert('Akun tidak aktif');</script>";
+        } else {
+            echo "<script>alert('Akun Anda tidak aktif.');</script>";
+        }
+    } else {
+        echo "<script>alert('Password salah.');</script>";
       }
     } else {
-      echo "<script>alert('Password salah');</script>";
-        }
-  } else {
-    echo "<script>alert('Email tidak ditemukan');</script>";
+        echo "<script>alert('Email tidak ditemukan.');</script>";
   }
 }
 ?>
@@ -70,7 +69,6 @@ if (isset($_POST['login'])) {
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
 
- 
 </head>
 
 <body>
@@ -99,18 +97,18 @@ if (isset($_POST['login'])) {
                     <p class="text-center small">Enter your username & password to login</p>
                   </div>
 
-                  <form class="row g-3 needs-validation" method="POST" novalidate>
+                  <form class="row g-3 needs-validation" method="POST" novalidate >
 
                     <div class="col-12">
                       <label class="form-label">Email</label>
-                      <input type="email" name="email" class="form-control" required>
-                      <div class="invalid-feedback">mahendrafathir9@gmail.com.</div>
+                        <input type="email" name="email" class="form-control" required>
+                        <div class="invalid-feedback">Please enter your email.</div>
                     </div>
 
                     <div class="col-12">
                       <label class="form-label">Password</label>
-                      <input type="password" name="password" class="form-control" required>
-                      <div class="invalid-feedback">ftrpro24</div>
+                      <input type="password" name="password" class="form-control"  required>
+                      <div class="invalid-feedback">Please enter your password!</div>
                     </div>
 
                     <div class="col-12">
@@ -123,7 +121,7 @@ if (isset($_POST['login'])) {
               </div>
 
               <div class="credits">
-                Designed by <a href="https://www.instagram.com/nehamstar?igsh=MTZuZnV2YWxlcm5ucw==/">Mahendra Fathir Amrulloh</a>
+                Designed by <a href="https://www.instagram.com/nehamstar?igsh=MTZuZnV2YWxlcm5ucw==" target="_blank">Mahendra Fathir Amrulloh</a>
               </div>
 
             </div>

@@ -1,50 +1,41 @@
 <?php
-include "koneksi.php";
+session_start();
+include 'koneksi.php';
+
+// cek apakah sudah login
+if (!isset($_SESSION['login'])) {
+    header('Location: login.php');
+    exit;
+}
 
 $id = $_GET['id'];
-$data = mysqli_query($conn, "SELECT * FROM users WHERE id='$id'");
-$user = mysqli_fetch_array($data);
+$data = mysqli_query($conn, "SELECT * FROM users WHERE id = '$id'");
+$user = mysqli_fetch_array($data); 
 
 if (isset($_POST['update'])) {
+    $name = mysqli_real_escape_string($conn, $_POST['name']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $password = $_POST['password'];
+    $role = $_POST['role'];
+    $is_active = $_POST['is_active'];
 
-    $name       = mysqli_real_escape_string($conn, $_POST['name']);
-    $email      = mysqli_real_escape_string($conn, $_POST['email']);
-    $password   = $_POST['password'];
-    $role       = $_POST['role'];
-    $is_active  = $_POST['is_active'];
-
-    // cek email (kecuali email milik user ini sendiri)
-    $cek = mysqli_query($conn, "SELECT * FROM users WHERE email='$email' AND id!='$id'");
+    //cek email kecuali email punya user
+    $cek = mysqli_query($conn, "SELECT email FROM users WHERE email = '$email' AND id != '$id'");
     if (mysqli_num_rows($cek) > 0) {
-        echo "<script>alert('Email sudah digunakan user lain!'); window.location='users.php';</script>";
+        echo "<script>alert('Email sudah terdaftar!'); window.location='e_user.php?id=$id';</script>";
         exit;
     }
-
-    // jika password diisi -> update password
+    //Jika Password kosong -> tidak update password
     if (!empty($password)) {
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
-
-        $query = mysqli_query($conn, "UPDATE users SET 
-                name='$name',
-                email='$email',
-                password='$password_hash',
-                role='$role',
-                is_active='$is_active'
-                WHERE id='$id'");
-    } else {
-        // jika password kosong -> jangan update password
-        $query = mysqli_query($conn, "UPDATE users SET 
-                name='$name',
-                email='$email',
-                role='$role',
-                is_active='$is_active'
-                WHERE id='$id'");
+        $query = mysqli_query($conn, "UPDATE users SET name='$name', email='$email', password='$password_hash', role='$role', is_active='$is_active' WHERE id='$id'");
+    } else { //jika password kosong
+        $query = mysqli_query($conn, "UPDATE users SET name='$name', email='$email', role='$role', is_active='$is_active' WHERE id='$id'");
     }
-
     if ($query) {
         echo "<script>alert('User berhasil diupdate!'); window.location='users.php';</script>";
     } else {
-        echo "<script>alert('User gagal diupdate!'); window.location='users.php';</script>";
+        echo "<script>alert('User gagal diupdate!'); window.location='e_user.php?id=$id';</script>";
     }
 }
 ?>
@@ -55,7 +46,7 @@ if (isset($_POST['update'])) {
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>Manajemen User - inventori</title>
+    <title>Users - inventori</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
 
@@ -83,77 +74,47 @@ if (isset($_POST['update'])) {
 
 <body>
 
-    <!-- ======= Header ======= -->
-    <header id="header" class="header fixed-top d-flex align-items-center">
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center">
 
-        <div class="d-flex align-items-center justify-content-between">
-            <a href="index.php" class="logo d-flex align-items-center">
-                <img src="assets/img/logo.png" alt="">
-                <span class="d-none d-lg-block">Nama Sistem</span>
-            </a>
-            <i class="bi bi-list toggle-sidebar-btn"></i>
-        </div><!-- End Logo -->
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="index.php" class="logo d-flex align-items-center">
+        <img src="assets/img/logo.png" alt="">
+        <span class="d-none d-lg-block">inventori</span>
+      </a>
+      <i class="bi bi-list toggle-sidebar-btn"></i>
+    </div><!-- End Logo -->
 
-        <nav class="header-nav ms-auto">
-            <ul class="d-flex align-items-center">
 
-                    <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                        <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
-                    </a><!-- End Profile Iamge Icon -->
+    <nav class="header-nav ms-auto">
+      <ul class="d-flex align-items-center">
+        <li class="nav-item dropdown pe-3">
 
-                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-                        <li class="dropdown-header">
-                            <h6>Kevin Anderson</h6>
-                            <span>Web Designer</span>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
+          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+            <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
+          </a><!-- End Profile Iamge Icon -->
 
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                                <i class="bi bi-person"></i>
-                                <span>My Profile</span>
-                            </a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+            <li class="dropdown-header">
+              <h6><?php echo isset($_SESSION['name']) ? $_SESSION['name'] : 'User'; ?></h6>
+              <span><?php echo isset($_SESSION['role']) ? $_SESSION['role'] : 'Role'; ?></span>
+            </li>
+            <li>
+              <hr class="dropdown-divider" />
+            </li>
 
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                                <i class="bi bi-gear"></i>
-                                <span>Account Settings</span>
-                            </a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="logout.php">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Sign Out</span>
+              </a>
+            </li>
+          </ul><!-- End Profile Dropdown Items -->
+        </li><!-- End Profile Nav -->
+      </ul>
+    </nav><!-- End Icons Navigation -->
 
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
-                                <i class="bi bi-question-circle"></i>
-                                <span>Need Help?</span>
-                            </a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <i class="bi bi-box-arrow-right"></i>
-                                <span>Sign Out</span>
-                            </a>
-                        </li>
-
-                    </ul><!-- End Profile Dropdown Items -->
-                </li><!-- End Profile Nav -->
-
-            </ul>
-        </nav><!-- End Icons Navigation -->
-
-    </header><!-- End Header -->
+  </header><!-- End Header -->
 
     <!-- ======= Sidebar ======= -->
     <aside id="sidebar" class="sidebar">
@@ -169,28 +130,28 @@ if (isset($_POST['update'])) {
 
             <li class="nav-item">
                 <a class="nav-link collapsed" href="kategori_produk.php">
-                    <i class="bi bi-person"></i>
+                    <i class="bi bi-tags"></i>
                     <span>Kategori Produk</span>
                 </a>
             </li><!-- End Profile Page Nav -->
 
             <li class="nav-item">
                 <a class="nav-link collapsed" href="produk.php">
-                    <i class="bi bi-question-circle"></i>
-                    <span>Data_Produk</span>
+                    <i class="bi bi-box-seam"></i>
+                    <span>Data Produk</span>
                 </a>
             </li><!-- End F.A.Q Page Nav -->
 
             <li class="nav-item">
                 <a class="nav-link collapsed" href="laporan.php">
-                    <i class="bi bi-envelope"></i>
+                    <i class="bi bi-bar-chart-line"></i>
                     <span>Laporan</span>
                 </a>
             </li><!-- End Contact Page Nav -->
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="users.php">
-                    <i class="bi bi-card-list"></i>
+                <a class="nav-link " href="users.php">
+                    <i class="bi bi-people"></i>
                     <span>Manajemen User</span>
                 </a>
             </li><!-- End Register Page Nav -->
@@ -205,7 +166,7 @@ if (isset($_POST['update'])) {
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
-                    <li class="breadcrumb-item">Manajemen User</li>
+                    <li class="breadcrumb-item"><a href="users.php">Manajemen User</a></li>
                     <li class="breadcrumb-item active">Edit</li>
                 </ol>
             </nav>
@@ -216,50 +177,41 @@ if (isset($_POST['update'])) {
 
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Vertical Form</h5>
+                            <h5 class="card-title">Edit User</h5>
 
                             <!-- Vertical Form -->
                             <form class="row g-3" method="post">
-
                                 <div class="col-12">
-                                    <label class="form-label">Nama</label>
-                                    <input type="text" class="form-control" name="name"
-                                        value="<?php echo $user['name']; ?>" required>
+                                    <label for="name" class="form-label">Nama</label>
+                                    <input type="text" class="form-control" id="name" name="name" value="<?php echo $user['name'] ?>" required>
                                 </div>
-
                                 <div class="col-12">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" class="form-control" name="email"
-                                        value="<?php echo $user['email']; ?>" required>
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="<?php echo $user['email'] ?>" required>
                                 </div>
-
                                 <div class="col-12">
-                                    <label class="form-label">Password</label>
-                                    <input type="Password" class="form-control" name="password">
+                                    <label for="password" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="password" name="password">
                                     <small class="text-muted">Kosongkan jika tidak ingin mengubah password</small>
                                 </div>
-
                                 <div class="col-12">
-                                    <label class="form-label">Role</label>
-                                    <select class="form-control" name="role" required>
+                                    <label for="role" class="form-label">Role</label>
+                                    <select class="form-control" id="role" name="role" required>
+                                        <option value="Staff" <?php if ($user['role'] == 'Staff') echo 'selected'; ?>>Staff</option>
                                         <option value="admin" <?php if ($user['role'] == 'admin') echo 'selected'; ?>>Admin</option>
-                                        <option value="staff" <?php if ($user['role'] == 'staff') echo 'selected'; ?>>Staff</option>
                                     </select>
                                 </div>
-
                                 <div class="col-12">
-                                    <label class="form-label">Status</label>
-                                    <select class="form-control" name="is_active">
+                                    <label for="is_active" class="form-label">Status</label>
+                                    <select class="form-control" id="is_active" name="is_active">
                                         <option value="1" <?php if ($user['is_active'] == 1) echo 'selected'; ?>>Aktif</option>
-                                        <option value="0" <?php if ($user['is_active'] == 0) echo 'selected'; ?>>Nonaktif</option>
+                                        <option value="0" <?php if ($user['is_active'] == 0) echo 'selected'; ?>>Tidak Aktif</option>
                                     </select>
                                 </div>
-
                                 <div class="text-center">
-                                    <a href="users.php" class="btn btn-warning">Kembali</a>
-                                    <button type="submit" class="btn btn-success" name="update">Update</button>
+                                <a href="users.php" class="btn btn-dark">Kembali</a>
+                                <button type="submit" class="btn btn-success" name="update">Update</button>
                                 </div>
-
                             </form><!-- Vertical Form -->
 
                         </div>
@@ -270,15 +222,15 @@ if (isset($_POST['update'])) {
 
     </main><!-- End #main -->
 
-    <!-- ======= Footer ======= -->
-    <footer id="footer" class="footer">
-        <div class="copyright">
-            &copy; Copyright <strong><span>Nama Sistem</span></strong>. All Rights Reserved
-        </div>
-        <div class="credits">
-            Designed by <a href="">Nama Kalian</a>
-        </div>
-    </footer><!-- End Footer -->
+  <!-- ======= Footer ======= -->
+  <footer id="footer" class="footer">
+    <div class="copyright">
+      &copy; Copyright <strong><span>inventori</span></strong>. All Rights Reserved
+    </div>
+    <div class="credits">
+      Designed by <a href="https://www.instagram.com/nehamstar?igsh=MTZuZnV2YWxlcm5ucw==">Mahendra Fathir Amrulloh</a>
+    </div>
+  </footer><!-- End Footer -->
 
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
